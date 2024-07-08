@@ -38,8 +38,9 @@ export function useCanvas(
       });
 
       paper.on("element:contextmenu", (elementView, evt) => {
+        evt.preventDefault();
+        selectCell(elementView.model); // Select the cell on right click
         showContextMenu(evt, canvasContainer.value as HTMLElement);
-        selectedCell.value = elementView.model;
       });
 
       paper.on("element:pointerdown", (elementView) => {
