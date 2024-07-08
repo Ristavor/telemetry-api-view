@@ -1,30 +1,52 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <div id="app">
+    <ActionPanel />
+    <div class="main-content">
+      <NavigatorPanel />
+      <CanvasComponent />
+      <SettingsPanel />
+    </div>
+    <InfoPanel />
+  </div>
 </template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import ActionPanel from "./components/ActionPanel.vue";
+import InfoPanel from "./components/InfoPanel.vue";
+import NavigatorPanel from "./components/NavigatorPanel.vue";
+import SettingsPanel from "./components/SettingsPanel.vue";
+import CanvasComponent from "./components/CanvasComponent.vue";
+
+export default defineComponent({
+  name: "App",
+  components: {
+    ActionPanel,
+    InfoPanel,
+    NavigatorPanel,
+    SettingsPanel,
+    CanvasComponent,
+  },
+});
+</script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
-nav {
-  padding: 30px;
+.main-content {
+  display: flex;
+  flex-grow: 1;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+.main-content > * {
+  border-right: 1px solid #ddd;
 }
 
-nav a.router-link-exact-active {
-  color: #42b983;
+.main-content > *:last-child {
+  border-right: none;
 }
 </style>
