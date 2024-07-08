@@ -85,8 +85,19 @@ export function useCanvas(
         shape = new BaseShape();
     }
     shape.position(150, 150); // Position the shape at the center
-    shape.attr("body/strokeDasharray", ""); // Set default border style to solid
+    shape.attr({
+      body: { fill: "#00ff00", strokeDasharray: "" }, // Set default color and border style
+      label: { text: shapeType },
+    });
     graph.addCell(shape);
+  };
+
+  const updateSelectedCell = (properties: { name: string; color: string }) => {
+    if (selectedCell.value) {
+      selectedCell.value.attr("label/text", properties.name);
+      selectedCell.value.attr("body/fill", properties.color);
+      selectedCellProperties.value = properties;
+    }
   };
 
   const duplicateCell = () => {
@@ -114,6 +125,7 @@ export function useCanvas(
     contextMenuVisible,
     contextMenuPosition,
     addShapeToCanvas,
+    updateSelectedCell,
     duplicateCell,
     deleteCell,
     hideContextMenu,

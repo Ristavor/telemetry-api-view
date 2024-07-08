@@ -7,12 +7,21 @@ export function useSelection() {
     null
   );
 
+  const rgbToHex = (rgb: string) => {
+    const result = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(rgb);
+    return result
+      ? `#${((1 << 24) + (+result[1] << 16) + (+result[2] << 8) + +result[3])
+          .toString(16)
+          .slice(1)}`
+      : rgb;
+  };
+
   const selectCell = (cell: joint.dia.Element) => {
     if (selectedCell.value) {
       selectedCell.value.attr("body/strokeDasharray", ""); // Reset previous selected cell border to solid
     }
     selectedCell.value = cell;
-    const color = cell.attr("body/fill");
+    const color = rgbToHex(cell.attr("body/fill"));
     const name = cell.attr("label/text");
     selectedCellProperties.value = { name, color };
     cell.attr("body/strokeDasharray", "5,5"); // Set selected cell border to dashed

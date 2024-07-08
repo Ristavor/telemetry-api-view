@@ -6,8 +6,12 @@
       <CanvasComponent
         :shapeToAdd="shapeToAdd || undefined"
         @update-properties="updateProperties"
+        ref="canvasComponent"
       />
-      <SettingsPanel :properties="selectedProperties" />
+      <SettingsPanel
+        :properties="selectedProperties"
+        @update-block="updateBlock"
+      />
     </div>
     <InfoPanel />
   </div>
@@ -35,6 +39,7 @@ export default defineComponent({
     const selectedProperties = ref<{ name: string; color: string } | null>(
       null
     );
+    const canvasComponent = ref(null);
 
     const updateProperties = (
       properties: { name: string; color: string } | null
@@ -42,10 +47,16 @@ export default defineComponent({
       selectedProperties.value = properties;
     };
 
+    const updateBlock = (properties: { name: string; color: string }) => {
+      (canvasComponent.value as any).updateSelectedCell(properties);
+    };
+
     return {
       shapeToAdd,
       selectedProperties,
       updateProperties,
+      updateBlock,
+      canvasComponent,
     };
   },
 });

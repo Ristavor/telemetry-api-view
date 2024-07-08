@@ -39,6 +39,7 @@ export default defineComponent({
       contextMenuVisible,
       contextMenuPosition,
       addShapeToCanvas,
+      updateSelectedCell,
       duplicateCell,
       deleteCell,
       hideContextMenu,
@@ -66,6 +67,7 @@ export default defineComponent({
       duplicateCell,
       deleteCell,
       hideContextMenu,
+      updateSelectedCell,
     };
   },
 });
