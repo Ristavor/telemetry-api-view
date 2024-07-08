@@ -31,7 +31,7 @@ export default defineComponent({
       default: undefined,
     },
   },
-  setup(props, { emit }) {
+  setup(props, { emit, expose }) {
     const canvasContainer = ref<HTMLDivElement | null>(null);
     const canvas = ref<HTMLDivElement | null>(null);
 
@@ -57,6 +57,11 @@ export default defineComponent({
 
     watch(selectedCellProperties, (newProperties) => {
       emit("update-properties", newProperties);
+    });
+
+    // Expose the method to the parent component
+    expose({
+      updateSelectedCell,
     });
 
     return {

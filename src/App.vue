@@ -39,7 +39,9 @@ export default defineComponent({
     const selectedProperties = ref<{ name: string; color: string } | null>(
       null
     );
-    const canvasComponent = ref(null);
+    const canvasComponent = ref<InstanceType<typeof CanvasComponent> | null>(
+      null
+    );
 
     const updateProperties = (
       properties: { name: string; color: string } | null
@@ -48,7 +50,9 @@ export default defineComponent({
     };
 
     const updateBlock = (properties: { name: string; color: string }) => {
-      (canvasComponent.value as any).updateSelectedCell(properties);
+      if (canvasComponent.value) {
+        canvasComponent.value.updateSelectedCell(properties);
+      }
     };
 
     return {
