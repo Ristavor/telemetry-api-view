@@ -85,10 +85,7 @@ export function useCanvas(
         shape = new BaseShape();
     }
     shape.position(150, 150); // Position the shape at the center
-    shape.attr({
-      body: { fill: "#00ff00", strokeDasharray: "" }, // Set default color and border style
-      label: { text: shapeType },
-    });
+    shape.attr("body/strokeDasharray", ""); // Set default border style to solid
     graph.addCell(shape);
   };
 
