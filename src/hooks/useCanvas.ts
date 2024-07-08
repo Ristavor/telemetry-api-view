@@ -1,6 +1,9 @@
 import { ref, onMounted, Ref } from "vue";
 import * as joint from "jointjs";
 import { BaseShape, ShapeA, ShapeB, ShapeC } from "../shapes";
+import { useContextMenu } from "./useContextMenu";
+import { useSelection } from "./useSelection";
+import { usePanningAndZooming } from "./usePanningAndZooming";
 
 export function useCanvas(
   canvasContainer: Ref<HTMLDivElement | null>,
@@ -9,12 +12,14 @@ export function useCanvas(
   let paper: joint.dia.Paper;
   let graph: joint.dia.Graph;
 
-  const contextMenuVisible = ref(false);
-  const contextMenuPosition = ref({ x: 0, y: 0 });
-  const selectedCell = ref<joint.dia.Element | null>(null);
-  const selectedCellProperties = ref<{ name: string; color: string } | null>(
-    null
-  );
+  const {
+    contextMenuVisible,
+    contextMenuPosition,
+    showContextMenu,
+    hideContextMenu,
+  } = useContextMenu();
+  const { selectedCell, selectedCellProperties, selectCell, deselectCell } =
+    useSelection();
 
   onMounted(() => {
     if (canvas.value && canvasContainer.value) {
@@ -33,13 +38,7 @@ export function useCanvas(
       });
 
       paper.on("element:contextmenu", (elementView, evt) => {
-        evt.preventDefault();
-        const { clientX: x, clientY: y } = evt;
-        const rect = canvasContainer.value?.getBoundingClientRect();
-        if (rect) {
-          contextMenuPosition.value = { x: x - rect.left, y: y - rect.top };
-        }
-        contextMenuVisible.value = true;
+        showContextMenu(evt, canvasContainer.value as HTMLElement);
         selectedCell.value = elementView.model;
       });
 
@@ -51,52 +50,19 @@ export function useCanvas(
         deselectCell();
       });
 
-      // Enable zooming with mouse wheel
-      let currentScale = 1;
-
-      canvasContainer.value.addEventListener("wheel", (event) => {
-        event.preventDefault();
-        const delta = event.deltaY * -0.005; // Reduced zoom step
-        currentScale += delta;
-        currentScale = Math.min(Math.max(0.5, currentScale), 2);
-        paper.scale(currentScale);
-      });
-
-      // Enable panning with left mouse button
-      let isPanning = false;
-      let startPoint = { x: 0, y: 0 };
-
-      paper.on("blank:pointerdown", (event) => {
-        isPanning = true;
-        startPoint = { x: event.clientX, y: event.clientY };
-        (paper.el as HTMLElement).style.cursor = "grab";
-      });
-
-      paper.el.addEventListener("mousemove", (event) => {
-        if (!isPanning) return;
-        const dx = event.clientX - startPoint.x;
-        const dy = event.clientY - startPoint.y;
-        const currentTranslate = paper.translate();
-        paper.translate(currentTranslate.tx + dx, currentTranslate.ty + dy);
-        startPoint = { x: event.clientX, y: event.clientY };
-      });
-
-      paper.el.addEventListener("mouseup", () => {
-        isPanning = false;
-        (paper.el as HTMLElement).style.cursor = "default";
-      });
-
-      paper.el.addEventListener("mouseleave", () => {
-        isPanning = false;
-        (paper.el as HTMLElement).style.cursor = "default";
-      });
+      const { enableZooming, enablePanning } = usePanningAndZooming(
+        canvasContainer.value,
+        paper
+      );
+      enableZooming();
+      enablePanning();
 
       document.addEventListener("click", (event) => {
         if (
           contextMenuVisible.value &&
           !(event.target as HTMLElement).closest(".context-menu")
         ) {
-          contextMenuVisible.value = false;
+          hideContextMenu();
         }
       });
     }
@@ -122,25 +88,6 @@ export function useCanvas(
     graph.addCell(shape);
   };
 
-  const selectCell = (cell: joint.dia.Element) => {
-    if (selectedCell.value) {
-      selectedCell.value.attr("body/strokeDasharray", ""); // Reset previous selected cell border to solid
-    }
-    selectedCell.value = cell;
-    const color = cell.attr("body/fill");
-    const name = cell.attr("label/text");
-    selectedCellProperties.value = { name, color };
-    cell.attr("body/strokeDasharray", "5,5"); // Set selected cell border to dashed
-  };
-
-  const deselectCell = () => {
-    if (selectedCell.value) {
-      selectedCell.value.attr("body/strokeDasharray", ""); // Reset border to solid
-    }
-    selectedCell.value = null;
-    selectedCellProperties.value = null;
-  };
-
   const duplicateCell = () => {
     if (selectedCell.value) {
       const clone = selectedCell.value.clone();
@@ -160,10 +107,6 @@ export function useCanvas(
       contextMenuVisible.value = false;
       deselectCell();
     }
-  };
-
-  const hideContextMenu = () => {
-    contextMenuVisible.value = false;
   };
 
   return {
