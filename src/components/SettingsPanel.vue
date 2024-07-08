@@ -1,16 +1,27 @@
 <template>
   <div class="settings-panel">
-    <label> <input type="checkbox" /> Setting 1 </label>
-    <label> <input type="checkbox" /> Setting 2 </label>
-    <label> <input type="checkbox" /> Setting 3 </label>
+    <div v-if="properties">
+      <h3>Selected Block Properties</h3>
+      <p><strong>Name:</strong> {{ properties.name }}</p>
+      <p><strong>Color:</strong> {{ properties.color }}</p>
+    </div>
+    <div v-else>
+      <p>Please select a block to view its properties.</p>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   name: "SettingsPanel",
+  props: {
+    properties: {
+      type: Object as PropType<{ name: string; color: string } | null>,
+      default: null,
+    },
+  },
 });
 </script>
 
@@ -19,9 +30,5 @@ export default defineComponent({
   width: 200px;
   background-color: #e1e1e1;
   padding: 10px;
-}
-label {
-  display: block;
-  margin-bottom: 10px;
 }
 </style>

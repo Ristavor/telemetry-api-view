@@ -28,10 +28,10 @@ export default defineComponent({
   props: {
     shapeToAdd: {
       type: String,
-      default: null,
+      default: undefined,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const canvasContainer = ref<HTMLDivElement | null>(null);
     const canvas = ref<HTMLDivElement | null>(null);
 
@@ -42,6 +42,7 @@ export default defineComponent({
       duplicateCell,
       deleteCell,
       hideContextMenu,
+      selectedCellProperties,
     } = useCanvas(canvasContainer, canvas);
 
     watch(
@@ -52,6 +53,10 @@ export default defineComponent({
         }
       }
     );
+
+    watch(selectedCellProperties, (newProperties) => {
+      emit("update-properties", newProperties);
+    });
 
     return {
       canvasContainer,

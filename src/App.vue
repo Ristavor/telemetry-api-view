@@ -3,15 +3,18 @@
     <ActionPanel />
     <div class="main-content">
       <NavigatorPanel @add-shape="shapeToAdd = $event" />
-      <CanvasComponent :shapeToAdd="shapeToAdd || ''" />
-      <SettingsPanel />
+      <CanvasComponent
+        :shapeToAdd="shapeToAdd || undefined"
+        @update-properties="updateProperties"
+      />
+      <SettingsPanel :properties="selectedProperties" />
     </div>
     <InfoPanel />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import ActionPanel from "./components/ActionPanel.vue";
 import InfoPanel from "./components/InfoPanel.vue";
 import NavigatorPanel from "./components/NavigatorPanel.vue";
@@ -27,9 +30,22 @@ export default defineComponent({
     SettingsPanel,
     CanvasComponent,
   },
-  data() {
+  setup() {
+    const shapeToAdd = ref<string | null>(null);
+    const selectedProperties = ref<{ name: string; color: string } | null>(
+      null
+    );
+
+    const updateProperties = (
+      properties: { name: string; color: string } | null
+    ) => {
+      selectedProperties.value = properties;
+    };
+
     return {
-      shapeToAdd: null,
+      shapeToAdd,
+      selectedProperties,
+      updateProperties,
     };
   },
 });

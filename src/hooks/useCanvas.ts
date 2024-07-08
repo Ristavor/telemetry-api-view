@@ -12,6 +12,9 @@ export function useCanvas(
   const contextMenuVisible = ref(false);
   const contextMenuPosition = ref({ x: 0, y: 0 });
   const selectedCell = ref<joint.dia.Element | null>(null);
+  const selectedCellProperties = ref<{ name: string; color: string } | null>(
+    null
+  );
 
   onMounted(() => {
     if (canvas.value && canvasContainer.value) {
@@ -38,6 +41,14 @@ export function useCanvas(
         }
         contextMenuVisible.value = true;
         selectedCell.value = elementView.model;
+      });
+
+      paper.on("element:pointerdown", (elementView) => {
+        selectCell(elementView.model);
+      });
+
+      paper.on("blank:pointerdown", () => {
+        deselectCell();
       });
 
       // Enable zooming with mouse wheel
@@ -107,7 +118,27 @@ export function useCanvas(
         shape = new BaseShape();
     }
     shape.position(150, 150); // Position the shape at the center
+    shape.attr("body/strokeDasharray", ""); // Set default border style to solid
     graph.addCell(shape);
+  };
+
+  const selectCell = (cell: joint.dia.Element) => {
+    if (selectedCell.value) {
+      selectedCell.value.attr("body/strokeDasharray", ""); // Reset previous selected cell border to solid
+    }
+    selectedCell.value = cell;
+    const color = cell.attr("body/fill");
+    const name = cell.attr("label/text");
+    selectedCellProperties.value = { name, color };
+    cell.attr("body/strokeDasharray", "5,5"); // Set selected cell border to dashed
+  };
+
+  const deselectCell = () => {
+    if (selectedCell.value) {
+      selectedCell.value.attr("body/strokeDasharray", ""); // Reset border to solid
+    }
+    selectedCell.value = null;
+    selectedCellProperties.value = null;
   };
 
   const duplicateCell = () => {
@@ -117,6 +148,7 @@ export function useCanvas(
         selectedCell.value.position().x,
         selectedCell.value.position().y
       ); // Copy position
+      clone.attr("body/strokeDasharray", ""); // Reset border to solid
       graph.addCell(clone);
       contextMenuVisible.value = false;
     }
@@ -126,6 +158,7 @@ export function useCanvas(
     if (selectedCell.value) {
       selectedCell.value.remove();
       contextMenuVisible.value = false;
+      deselectCell();
     }
   };
 
@@ -140,5 +173,6 @@ export function useCanvas(
     duplicateCell,
     deleteCell,
     hideContextMenu,
+    selectedCellProperties,
   };
 }
