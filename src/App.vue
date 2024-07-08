@@ -2,8 +2,8 @@
   <div id="app">
     <ActionPanel />
     <div class="main-content">
-      <NavigatorPanel />
-      <CanvasComponent />
+      <NavigatorPanel @add-shape="shapeToAdd = $event" />
+      <CanvasComponent :shapeToAdd="shapeToAdd || ''" />
       <SettingsPanel />
     </div>
     <InfoPanel />
@@ -26,6 +26,11 @@ export default defineComponent({
     NavigatorPanel,
     SettingsPanel,
     CanvasComponent,
+  },
+  data() {
+    return {
+      shapeToAdd: null,
+    };
   },
 });
 </script>
