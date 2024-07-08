@@ -1,4 +1,5 @@
-import * as joint from "jointjs";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import type * as joint from "jointjs";
 
 declare module "jointjs" {
   namespace dia {
@@ -7,3 +8,4 @@ declare module "jointjs" {
     }
   }
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
