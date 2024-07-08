@@ -6,6 +6,9 @@ declare module "jointjs" {
     interface Paper {
       el: HTMLElement;
     }
+
+    interface ElementView {
+      model: joint.dia.Element;
+    }
   }
 }
-/* eslint-enable @typescript-eslint/no-unused-vars */

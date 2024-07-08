@@ -1,6 +1,24 @@
 <template>
-  <div ref="canvasContainer" class="canvas-container">
+  <div
+    ref="canvasContainer"
+    class="canvas-container"
+    @click="hideContextMenu"
+    @contextmenu.prevent
+  >
     <div ref="canvas" class="canvas"></div>
+    <div
+      v-if="contextMenuVisible"
+      :style="{
+        top: `${contextMenuPosition.y}px`,
+        left: `${contextMenuPosition.x}px`,
+      }"
+      class="context-menu"
+    >
+      <ul>
+        <li @click="duplicateCell">Duplicate</li>
+        <li @click="deleteCell">Delete</li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -30,6 +48,10 @@ export default defineComponent({
     let paper: joint.dia.Paper;
     let graph: joint.dia.Graph;
 
+    const contextMenuVisible = ref(false);
+    const contextMenuPosition = ref({ x: 0, y: 0 });
+    const selectedCell = ref<joint.dia.Element | null>(null);
+
     onMounted(() => {
       if (canvas.value && canvasContainer.value) {
         graph = new joint.dia.Graph();
@@ -44,6 +66,17 @@ export default defineComponent({
           background: {
             color: "rgba(0, 255, 0, 0.3)",
           },
+        });
+
+        paper.on("element:contextmenu", (elementView, evt) => {
+          evt.preventDefault();
+          const { clientX: x, clientY: y } = evt;
+          const rect = canvasContainer.value?.getBoundingClientRect();
+          if (rect) {
+            contextMenuPosition.value = { x: x - rect.left, y: y - rect.top };
+          }
+          contextMenuVisible.value = true;
+          selectedCell.value = elementView.model;
         });
 
         // Enable zooming with mouse wheel
@@ -64,7 +97,7 @@ export default defineComponent({
         paper.on("blank:pointerdown", (event) => {
           isPanning = true;
           startPoint = { x: event.clientX, y: event.clientY };
-          paper.el.style.cursor = "grab"; // `el` is now recognized
+          (paper.el as HTMLElement).style.cursor = "grab";
         });
 
         paper.el.addEventListener("mousemove", (event) => {
@@ -78,12 +111,21 @@ export default defineComponent({
 
         paper.el.addEventListener("mouseup", () => {
           isPanning = false;
-          paper.el.style.cursor = "default";
+          (paper.el as HTMLElement).style.cursor = "default";
         });
 
         paper.el.addEventListener("mouseleave", () => {
           isPanning = false;
-          paper.el.style.cursor = "default";
+          (paper.el as HTMLElement).style.cursor = "default";
+        });
+
+        document.addEventListener("click", (event) => {
+          if (
+            contextMenuVisible.value &&
+            !(event.target as HTMLElement).closest(".context-menu")
+          ) {
+            contextMenuVisible.value = false;
+          }
         });
       }
     });
@@ -107,10 +149,38 @@ export default defineComponent({
       graph.addCell(shape);
     };
 
+    const duplicateCell = () => {
+      if (selectedCell.value) {
+        const clone = selectedCell.value.clone();
+        clone.position(
+          selectedCell.value.position().x,
+          selectedCell.value.position().y
+        ); // Copy position
+        graph.addCell(clone);
+        contextMenuVisible.value = false;
+      }
+    };
+
+    const deleteCell = () => {
+      if (selectedCell.value) {
+        selectedCell.value.remove();
+        contextMenuVisible.value = false;
+      }
+    };
+
+    const hideContextMenu = () => {
+      contextMenuVisible.value = false;
+    };
+
     return {
       canvasContainer,
       canvas,
       addShapeToCanvas,
+      contextMenuVisible,
+      contextMenuPosition,
+      duplicateCell,
+      deleteCell,
+      hideContextMenu,
     };
   },
 });
@@ -125,5 +195,24 @@ export default defineComponent({
 .canvas {
   width: 100%;
   height: 100%;
+}
+.context-menu {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 5px 0;
+}
+.context-menu li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.context-menu li:hover {
+  background-color: #f0f0f0;
 }
 </style>
