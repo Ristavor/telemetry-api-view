@@ -94,6 +94,10 @@ export function useCanvas(
       selectedCell.value.attr("label/text", properties.name);
       selectedCell.value.attr("body/fill", properties.color);
       selectedCellProperties.value = properties;
+
+      // Обновление данных модели
+      selectedCell.value.set("name", properties.name);
+      selectedCell.value.set("color", properties.color);
     }
   };
 
@@ -101,10 +105,11 @@ export function useCanvas(
     if (selectedCell.value) {
       const clone = selectedCell.value.clone();
       clone.position(
-        selectedCell.value.position().x,
-        selectedCell.value.position().y
-      ); // Copy position
-      clone.attr("body/strokeDasharray", ""); // Reset border to solid
+        selectedCell.value.position().x + 20,
+        selectedCell.value.position().y + 20
+      ); // Offset the position of the clone
+      // Устанавливаем те же атрибуты для клона
+      clone.attr(selectedCell.value.attributes.attrs);
       graph.addCell(clone);
       contextMenuVisible.value = false;
     }
