@@ -48,11 +48,14 @@ export function useCanvas(
       paper.on("element:pointerdown", (elementView, evt) => {
         if (evt.ctrlKey) {
           if (linkSource.value) {
-            const link = new joint.shapes.standard.Link({
-              source: { id: linkSource.value.id },
-              target: { id: elementView.model.id },
-            });
-            link.addTo(graph);
+            if (linkSource.value.id !== elementView.model.id) {
+              // Prevent linking to itself
+              const link = new joint.shapes.standard.Link({
+                source: { id: linkSource.value.id },
+                target: { id: elementView.model.id },
+              });
+              link.addTo(graph);
+            }
             linkSource.value = null;
           } else {
             linkSource.value = elementView.model;
@@ -60,6 +63,11 @@ export function useCanvas(
         } else {
           selectCell(elementView.model);
         }
+      });
+
+      paper.on("link:contextmenu", (linkView, evt) => {
+        evt.preventDefault();
+        linkView.model.remove(); // Remove the link on right click
       });
 
       paper.on("blank:pointerdown", () => {
