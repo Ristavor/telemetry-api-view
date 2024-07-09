@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, ref, watch, onMounted } from "vue";
 import ContextMenu from "./ContextMenu.vue";
 import { useCanvas } from "../hooks/useCanvas";
 

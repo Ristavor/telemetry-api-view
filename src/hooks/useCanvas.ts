@@ -1,4 +1,4 @@
-import { onMounted, Ref } from "vue";
+import { ref, onMounted, Ref } from "vue";
 import * as joint from "jointjs";
 import { BaseShape, ShapeA, ShapeB, ShapeC } from "../shapes";
 import { useContextMenu } from "./useContextMenu";
@@ -20,6 +20,8 @@ export function useCanvas(
   } = useContextMenu();
   const { selectedCell, selectedCellProperties, selectCell, deselectCell } =
     useSelection();
+
+  const linkSource = ref<joint.dia.Element | null>(null);
 
   onMounted(() => {
     if (canvas.value && canvasContainer.value) {
@@ -43,12 +45,26 @@ export function useCanvas(
         showContextMenu(evt, canvasContainer.value as HTMLElement);
       });
 
-      paper.on("element:pointerdown", (elementView) => {
-        selectCell(elementView.model);
+      paper.on("element:pointerdown", (elementView, evt) => {
+        if (evt.ctrlKey) {
+          if (linkSource.value) {
+            const link = new joint.shapes.standard.Link({
+              source: { id: linkSource.value.id },
+              target: { id: elementView.model.id },
+            });
+            link.addTo(graph);
+            linkSource.value = null;
+          } else {
+            linkSource.value = elementView.model;
+          }
+        } else {
+          selectCell(elementView.model);
+        }
       });
 
       paper.on("blank:pointerdown", () => {
         deselectCell();
+        linkSource.value = null;
       });
 
       const { enableZooming, enablePanning } = usePanningAndZooming(
@@ -105,7 +121,7 @@ export function useCanvas(
         selectedCell.value.position().y + 20
       ); // Offset the position of the clone
       // Устанавливаем те же атрибуты для клона
-      clone.attr(selectedCell.value.attr());
+      clone.attr(selectedCell.value.attributes.attrs);
       clone.attr("body/strokeDasharray", ""); // Сбрасываем границу у клона
       graph.addCell(clone);
       contextMenuVisible.value = false;
