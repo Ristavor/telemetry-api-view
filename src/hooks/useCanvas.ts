@@ -1,6 +1,6 @@
 import { ref, onMounted, Ref } from "vue";
 import * as joint from "jointjs";
-import { BaseShape, ShapeA, ShapeB, ShapeC } from "../shapes";
+import { BaseShape, ShapeA, ShapeB, ShapeC, BlockParams } from "../shapes";
 import { useContextMenu } from "./useContextMenu";
 import { useSelection } from "./useSelection";
 import { usePanningAndZooming } from "./usePanningAndZooming";
@@ -113,10 +113,15 @@ export function useCanvas(
     graph.addCell(shape);
   };
 
-  const updateSelectedCell = (properties: { name: string; color: string }) => {
+  const updateSelectedCell = (properties: {
+    name: string;
+    color: string;
+    params: BlockParams;
+  }) => {
     if (selectedCell.value) {
       selectedCell.value.attr("label/text", properties.name);
       selectedCell.value.attr("body/fill", properties.color);
+      selectedCell.value.set("params", properties.params);
       selectedCellProperties.value = properties;
     }
   };
@@ -128,8 +133,9 @@ export function useCanvas(
         selectedCell.value.position().x + 20,
         selectedCell.value.position().y + 20
       ); // Offset the position of the clone
-      // Устанавливаем те же атрибуты для клона
+      // Устанавливаем те же атрибуты и параметры для клона
       clone.attr(selectedCell.value.attributes.attrs);
+      clone.set("params", { ...selectedCell.value.get("params") });
       clone.attr("body/strokeDasharray", ""); // Сбрасываем границу у клона
       graph.addCell(clone);
       contextMenuVisible.value = false;

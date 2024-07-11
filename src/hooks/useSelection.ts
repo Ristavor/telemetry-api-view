@@ -1,11 +1,14 @@
 import { ref } from "vue";
 import * as joint from "jointjs";
+import { BlockParams } from "../shapes";
 
 export function useSelection() {
   const selectedCell = ref<joint.dia.Element | null>(null);
-  const selectedCellProperties = ref<{ name: string; color: string } | null>(
-    null
-  );
+  const selectedCellProperties = ref<{
+    name: string;
+    color: string;
+    params: BlockParams;
+  } | null>(null);
 
   const rgbToHex = (rgb: string) => {
     const result = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(rgb);
@@ -23,7 +26,8 @@ export function useSelection() {
     selectedCell.value = cell;
     const color = rgbToHex(cell.attr("body/fill"));
     const name = cell.attr("label/text");
-    selectedCellProperties.value = { name, color };
+    const params = cell.get("params");
+    selectedCellProperties.value = { name, color, params };
     cell.attr("body/strokeDasharray", "5,5"); // Set selected cell border to dashed
   };
 

@@ -24,6 +24,7 @@ import InfoPanel from "./components/InfoPanel.vue";
 import NavigatorPanel from "./components/NavigatorPanel.vue";
 import SettingsPanel from "./components/SettingsPanel.vue";
 import CanvasComponent from "./components/CanvasComponent.vue";
+import { BlockParams } from "./shapes";
 
 export default defineComponent({
   name: "App",
@@ -36,20 +37,21 @@ export default defineComponent({
   },
   setup() {
     const shapeToAdd = ref<string | null>(null);
-    const selectedProperties = ref<{ name: string; color: string } | null>(
-      null
-    );
+    const selectedProperties = ref<{
+      name: string;
+      params: BlockParams;
+    } | null>(null);
     const canvasComponent = ref<InstanceType<typeof CanvasComponent> | null>(
       null
     );
 
     const updateProperties = (
-      properties: { name: string; color: string } | null
+      properties: { name: string; params: BlockParams } | null
     ) => {
       selectedProperties.value = properties;
     };
 
-    const updateBlock = (properties: { name: string; color: string }) => {
+    const updateBlock = (properties: { name: string; params: BlockParams }) => {
       if (canvasComponent.value) {
         canvasComponent.value.updateSelectedCell(properties);
       }

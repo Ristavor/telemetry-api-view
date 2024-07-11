@@ -1,5 +1,9 @@
 import * as joint from "jointjs";
 
+export interface BlockParams {
+  [key: string]: any;
+}
+
 const baseMarkup = [
   {
     tagName: "rect",
@@ -12,7 +16,7 @@ const baseMarkup = [
 ];
 
 export class BaseShape extends joint.dia.Element {
-  constructor() {
+  constructor(params: BlockParams = {}) {
     super({
       type: "baseShape",
       size: { width: 100, height: 40 },
@@ -39,12 +43,16 @@ export class BaseShape extends joint.dia.Element {
       },
       markup: baseMarkup,
     });
+    this.set("params", params);
   }
 }
 
 export class ShapeA extends BaseShape {
   constructor() {
-    super();
+    super({
+      parameter1: "Value 1A",
+      parameter2: "Value 2A",
+    });
     this.attr({
       body: { fill: "#ff0000" }, // Red color in hex format
       label: { text: "ShapeA" },
@@ -54,7 +62,10 @@ export class ShapeA extends BaseShape {
 
 export class ShapeB extends BaseShape {
   constructor() {
-    super();
+    super({
+      parameter1: "Value 1B",
+      parameter2: "Value 2B",
+    });
     this.attr({
       body: { fill: "#00ff00" }, // Green color in hex format
       label: { text: "ShapeB" },
@@ -64,7 +75,10 @@ export class ShapeB extends BaseShape {
 
 export class ShapeC extends BaseShape {
   constructor() {
-    super();
+    super({
+      parameter1: "Value 1C",
+      parameter2: "Value 2C",
+    });
     this.attr({
       body: { fill: "#0000ff" }, // Blue color in hex format
       label: { text: "ShapeC" },
