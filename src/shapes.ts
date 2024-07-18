@@ -53,6 +53,7 @@ export class BaseShape extends joint.dia.Element {
   }
 
   processInputData() {
+    // Default processing: simply generate data from params and inputData
     const params = this.get("params");
     const inputData = this.get("inputData");
     this.set("data", this.generateData(params, inputData));
@@ -75,6 +76,13 @@ export class ShapeA extends BaseShape {
       label: { text: "ShapeA" },
     });
   }
+
+  processInputData() {
+    // Custom processing for ShapeA
+    const params = this.get("params");
+    const inputData = this.get("inputData");
+    this.set("data", `${params.parameter1}-${params.parameter2}:${inputData}`);
+  }
 }
 
 export class ShapeB extends BaseShape {
@@ -89,6 +97,13 @@ export class ShapeB extends BaseShape {
       label: { text: "ShapeB" },
     });
   }
+
+  processInputData() {
+    // Custom processing for ShapeB
+    const params = this.get("params");
+    const inputData = this.get("inputData");
+    this.set("data", `${inputData}:${params.parameter1}-${params.parameter2}`);
+  }
 }
 
 export class ShapeC extends BaseShape {
@@ -102,5 +117,12 @@ export class ShapeC extends BaseShape {
       body: { fill: "#0000ff" }, // Blue color in hex format
       label: { text: "ShapeC" },
     });
+  }
+
+  processInputData() {
+    // Custom processing for ShapeC
+    const params = this.get("params");
+    const inputData = this.get("inputData");
+    this.set("data", `${params.parameter1}${inputData}${params.parameter2}`);
   }
 }
