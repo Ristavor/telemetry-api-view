@@ -122,6 +122,10 @@ export function useCanvas(
       selectedCell.value.attr("label/text", properties.name);
       selectedCell.value.attr("body/fill", properties.color);
       selectedCell.value.set("params", properties.params);
+      selectedCell.value.set(
+        "data",
+        selectedCell.value.generateData(properties.params)
+      ); // Обновляем данные
       selectedCellProperties.value = properties;
     }
   };
@@ -136,6 +140,7 @@ export function useCanvas(
       // Устанавливаем те же атрибуты и параметры для клона
       clone.attr(selectedCell.value.attributes.attrs);
       clone.set("params", { ...selectedCell.value.get("params") });
+      clone.set("data", selectedCell.value.get("data")); // Копируем данные
       clone.attr("body/strokeDasharray", ""); // Сбрасываем границу у клона
       graph.addCell(clone);
       contextMenuVisible.value = false;

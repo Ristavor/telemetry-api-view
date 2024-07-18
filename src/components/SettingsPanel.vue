@@ -14,6 +14,10 @@
         <strong>Color:</strong>
         <input type="color" v-model="updatedColor" />
       </p>
+      <p>
+        <strong>Data:</strong>
+        <input type="text" v-model="updatedData" disabled />
+      </p>
       <button @click="updateBlock">Update</button>
     </div>
     <div v-else>
@@ -34,6 +38,7 @@ export default defineComponent({
         name: string;
         color: string;
         params: BlockParams;
+        data: string;
       } | null>,
       default: null,
     },
@@ -43,16 +48,19 @@ export default defineComponent({
     const updatedName = ref("");
     const updatedParams = ref<BlockParams>({});
     const updatedColor = ref("#000000");
+    const updatedData = ref("");
 
     watchEffect(() => {
       if (props.properties) {
         updatedName.value = props.properties.name;
         updatedParams.value = { ...props.properties.params };
         updatedColor.value = props.properties.color;
+        updatedData.value = props.properties.data;
       } else {
         updatedName.value = "";
         updatedParams.value = {};
         updatedColor.value = "#000000";
+        updatedData.value = "";
       }
     });
 
@@ -68,6 +76,7 @@ export default defineComponent({
       updatedName,
       updatedParams,
       updatedColor,
+      updatedData,
       updateBlock,
     };
   },
