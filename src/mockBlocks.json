@@ -28,5 +28,14 @@
     "dataProcessor": "processShapeCData",
     "color": "#0000ff",
     "label": "ShapeC"
+  },
+  {
+    "type": "ToleranceBasedFilter",
+    "params": {
+      "tolerance": "0.5"
+    },
+    "dataProcessor": "toleranceBasedFilter",
+    "color": "#ffff00",
+    "label": "ToleranceFilter"
   }
 ]
