@@ -44,15 +44,22 @@ export class BaseShape extends joint.dia.Element {
       markup: baseMarkup,
     });
     this.set("params", params);
-    this.set("data", this.generateData(params));
+    this.set("inputData", "");
+    this.set("data", "");
   }
 
-  generateData(params: BlockParams): string {
-    return Object.values(params).join(" ");
+  generateData(params: BlockParams, inputData: string): string {
+    return `${Object.values(params).join(" ")} ${inputData}`;
+  }
+
+  processInputData() {
+    const params = this.get("params");
+    const inputData = this.get("inputData");
+    this.set("data", this.generateData(params, inputData));
   }
 
   receiveData(data: string) {
-    this.set("data", data);
+    this.set("inputData", data);
   }
 }
 
@@ -67,7 +74,6 @@ export class ShapeA extends BaseShape {
       body: { fill: "#ff0000" }, // Red color in hex format
       label: { text: "ShapeA" },
     });
-    this.set("data", this.generateData(params));
   }
 }
 
@@ -82,7 +88,6 @@ export class ShapeB extends BaseShape {
       body: { fill: "#00ff00" }, // Green color in hex format
       label: { text: "ShapeB" },
     });
-    this.set("data", this.generateData(params));
   }
 }
 
@@ -97,6 +102,5 @@ export class ShapeC extends BaseShape {
       body: { fill: "#0000ff" }, // Blue color in hex format
       label: { text: "ShapeC" },
     });
-    this.set("data", this.generateData(params));
   }
 }

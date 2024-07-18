@@ -117,16 +117,17 @@ export function useCanvas(
     name: string;
     color: string;
     params: BlockParams;
+    inputData: string;
   }) => {
     if (selectedCell.value) {
       selectedCell.value.attr("label/text", properties.name);
       selectedCell.value.attr("body/fill", properties.color);
       selectedCell.value.set("params", properties.params);
-      selectedCell.value.set(
-        "data",
-        selectedCell.value.generateData(properties.params)
-      ); // Обновляем данные
-      selectedCellProperties.value = properties;
+      selectedCell.value.set("inputData", properties.inputData);
+      selectedCellProperties.value = {
+        ...properties,
+        data: selectedCell.value.get("data"),
+      };
     }
   };
 
@@ -140,6 +141,7 @@ export function useCanvas(
       // Устанавливаем те же атрибуты и параметры для клона
       clone.attr(selectedCell.value.attributes.attrs);
       clone.set("params", { ...selectedCell.value.get("params") });
+      clone.set("inputData", selectedCell.value.get("inputData"));
       clone.set("data", selectedCell.value.get("data")); // Копируем данные
       clone.attr("body/strokeDasharray", ""); // Сбрасываем границу у клона
       graph.addCell(clone);
@@ -173,6 +175,16 @@ export function useCanvas(
     }
   };
 
+  const resolve = () => {
+    if (selectedCell.value) {
+      selectedCell.value.processInputData();
+      selectedCellProperties.value = {
+        ...selectedCellProperties.value!,
+        data: selectedCell.value.get("data"),
+      };
+    }
+  };
+
   return {
     contextMenuVisible,
     contextMenuPosition,
@@ -183,5 +195,6 @@ export function useCanvas(
     hideContextMenu,
     selectedCellProperties,
     start,
+    resolve,
   };
 }

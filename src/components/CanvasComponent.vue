@@ -45,6 +45,7 @@ export default defineComponent({
       hideContextMenu,
       selectedCellProperties,
       start,
+      resolve,
     } = useCanvas(canvasContainer, canvas);
 
     watch(
@@ -64,6 +65,7 @@ export default defineComponent({
     expose({
       updateSelectedCell,
       start,
+      resolve,
     });
 
     return {
@@ -76,6 +78,7 @@ export default defineComponent({
       hideContextMenu,
       updateSelectedCell,
       start,
+      resolve,
     };
   },
 });

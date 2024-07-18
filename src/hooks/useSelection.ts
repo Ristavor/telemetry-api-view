@@ -8,6 +8,7 @@ export function useSelection() {
     name: string;
     color: string;
     params: BlockParams;
+    inputData: string;
     data: string;
   } | null>(null);
 
@@ -28,8 +29,9 @@ export function useSelection() {
     const color = rgbToHex(cell.attr("body/fill"));
     const name = cell.attr("label/text");
     const params = cell.get("params");
+    const inputData = cell.get("inputData");
     const data = cell.get("data");
-    selectedCellProperties.value = { name, color, params, data };
+    selectedCellProperties.value = { name, color, params, inputData, data };
     cell.attr("body/strokeDasharray", "5,5"); // Set selected cell border to dashed
   };
 
