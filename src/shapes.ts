@@ -1,10 +1,6 @@
 import * as joint from "jointjs";
 import { dataProcessors } from "./dataProcessors";
-import mockBlocks from "./mockBlocks.json";
-
-export interface BlockParams {
-  [key: string]: any;
-}
+import { BlockParams } from "./types";
 
 const baseMarkup = [
   {
@@ -80,15 +76,3 @@ export const createShape = (
 ): DynamicShape => {
   return new DynamicShape(params, processorName, color, label);
 };
-
-export const availableShapes = mockBlocks.map((block) => ({
-  type: block.type,
-  create: () =>
-    createShape(
-      block.type,
-      block.params,
-      block.dataProcessor,
-      block.color,
-      block.label
-    ),
-}));

@@ -1,9 +1,10 @@
 import { ref, onMounted, Ref } from "vue";
 import * as joint from "jointjs";
-import { DynamicShape, createShape, availableShapes } from "../shapes";
+import { DynamicShape, createShape } from "../shapes";
 import { useContextMenu } from "./useContextMenu";
 import { useSelection } from "./useSelection";
 import { usePanningAndZooming } from "./usePanningAndZooming";
+import { fetchAlgorithms, sendAlgorithmData } from "../services/api";
 
 export function useCanvas(
   canvasContainer: Ref<HTMLDivElement | null>,
@@ -22,8 +23,17 @@ export function useCanvas(
     useSelection();
 
   const linkSource = ref<joint.dia.Element | null>(null);
+  const availableShapes = ref<
+    Array<{ type: string; create: () => DynamicShape }>
+  >([]);
 
-  onMounted(() => {
+  onMounted(async () => {
+    const algorithms = await fetchAlgorithms();
+    availableShapes.value = Object.keys(algorithms).map((type) => ({
+      type,
+      create: () => createShape(type, algorithms[type], type, "#ff0000", type),
+    }));
+
     if (canvas.value && canvasContainer.value) {
       graph = new joint.dia.Graph();
 
@@ -94,7 +104,9 @@ export function useCanvas(
   });
 
   const addShapeToCanvas = (shapeType: string) => {
-    const shapeInfo = availableShapes.find((shape) => shape.type === shapeType);
+    const shapeInfo = availableShapes.value.find(
+      (shape) => shape.type === shapeType
+    );
     if (!shapeInfo) return;
 
     const shape = shapeInfo.create();
@@ -165,12 +177,20 @@ export function useCanvas(
     }
   };
 
-  const resolve = () => {
+  const resolve = async () => {
     if (selectedCell.value) {
-      selectedCell.value.processInputData();
+      const algorithmName = selectedCell.value.attr("label/text");
+      const params = selectedCell.value.get("params");
+      const inputData = selectedCell.value.get("inputData");
+      const response = await sendAlgorithmData(
+        algorithmName,
+        params,
+        inputData
+      );
+      selectedCell.value.set("data", response);
       selectedCellProperties.value = {
         ...selectedCellProperties.value!,
-        data: selectedCell.value.get("data"),
+        data: response,
       };
     }
   };

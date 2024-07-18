@@ -15,16 +15,20 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
-import mockBlocks from "../mockBlocks.json";
+import { fetchAlgorithms } from "../services/api";
 
 export default defineComponent({
   name: "NavigatorPanel",
   emits: ["add-shape"],
-  setup() {
-    const blocks = ref(mockBlocks);
+  setup(_, { emit }) {
+    const blocks = ref([]);
 
-    onMounted(() => {
-      // You can add additional logic here if needed
+    onMounted(async () => {
+      const algorithms = await fetchAlgorithms();
+      blocks.value = Object.keys(algorithms).map((type) => ({
+        type,
+        params: algorithms[type],
+      }));
     });
 
     return {
