@@ -1,6 +1,6 @@
 import { ref, onMounted, Ref } from "vue";
 import * as joint from "jointjs";
-import { BaseShape, ShapeA, ShapeB, ShapeC, BlockParams } from "../shapes";
+import { DynamicShape, createShape, availableShapes } from "../shapes";
 import { useContextMenu } from "./useContextMenu";
 import { useSelection } from "./useSelection";
 import { usePanningAndZooming } from "./usePanningAndZooming";
@@ -94,20 +94,10 @@ export function useCanvas(
   });
 
   const addShapeToCanvas = (shapeType: string) => {
-    let shape: BaseShape;
-    switch (shapeType) {
-      case "ShapeA":
-        shape = new ShapeA();
-        break;
-      case "ShapeB":
-        shape = new ShapeB();
-        break;
-      case "ShapeC":
-        shape = new ShapeC();
-        break;
-      default:
-        shape = new BaseShape();
-    }
+    const shapeInfo = availableShapes.find((shape) => shape.type === shapeType);
+    if (!shapeInfo) return;
+
+    const shape = shapeInfo.create();
     shape.position(150, 150); // Position the shape at the center
     shape.attr("body/strokeDasharray", ""); // Set default border style to solid
     graph.addCell(shape);
@@ -166,7 +156,7 @@ export function useCanvas(
       outgoingLinks.forEach((link) => {
         const targetId = link.get("target").id;
         if (targetId) {
-          const targetCell = graph.getCell(targetId) as BaseShape;
+          const targetCell = graph.getCell(targetId) as DynamicShape;
           if (targetCell) {
             targetCell.receiveData(cellData);
           }

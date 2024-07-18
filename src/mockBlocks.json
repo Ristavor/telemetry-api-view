@@ -1,0 +1,32 @@
+[
+  {
+    "type": "ShapeA",
+    "params": {
+      "parameter1": "Value 1A",
+      "parameter2": "Value 2A"
+    },
+    "dataProcessor": "processShapeAData",
+    "color": "#ff0000",
+    "label": "ShapeA"
+  },
+  {
+    "type": "ShapeB",
+    "params": {
+      "parameter1": "Value 1B",
+      "parameter2": "Value 2B"
+    },
+    "dataProcessor": "processShapeBData",
+    "color": "#00ff00",
+    "label": "ShapeB"
+  },
+  {
+    "type": "ShapeC",
+    "params": {
+      "parameter1": "Value 1C",
+      "parameter2": "Value 2C"
+    },
+    "dataProcessor": "processShapeCData",
+    "color": "#0000ff",
+    "label": "ShapeC"
+  }
+]

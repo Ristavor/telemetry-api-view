@@ -1,4 +1,6 @@
 import * as joint from "jointjs";
+import { dataProcessors } from "./dataProcessors";
+import mockBlocks from "./mockBlocks.json";
 
 export interface BlockParams {
   [key: string]: any;
@@ -15,22 +17,27 @@ const baseMarkup = [
   },
 ];
 
-export class BaseShape extends joint.dia.Element {
-  constructor(params: BlockParams = {}) {
+export class DynamicShape extends joint.dia.Element {
+  constructor(
+    params: BlockParams = {},
+    processorName = "",
+    color = "#ffffff",
+    label = "DynamicShape"
+  ) {
     super({
-      type: "baseShape",
+      type: "dynamicShape",
       size: { width: 100, height: 40 },
       attrs: {
         body: {
           width: 100,
           height: 40,
-          fill: "#ffffff", // Default white color in hex format
+          fill: color, // Default color in hex format
           stroke: "#000000",
           strokeWidth: 2,
           strokeDasharray: "",
         },
         label: {
-          text: "BaseShape",
+          text: label,
           fill: "#000000",
           fontSize: 14,
           textAnchor: "middle",
@@ -46,17 +53,17 @@ export class BaseShape extends joint.dia.Element {
     this.set("params", params);
     this.set("inputData", "");
     this.set("data", "");
-  }
-
-  generateData(params: BlockParams, inputData: string): string {
-    return `${Object.values(params).join(" ")} ${inputData}`;
+    this.set("dataProcessor", processorName);
   }
 
   processInputData() {
-    // Default processing: simply generate data from params and inputData
     const params = this.get("params");
     const inputData = this.get("inputData");
-    this.set("data", this.generateData(params, inputData));
+    const processorName = this.get("dataProcessor");
+    const processor = dataProcessors[processorName];
+    if (processor) {
+      this.set("data", processor(params, inputData));
+    }
   }
 
   receiveData(data: string) {
@@ -64,65 +71,24 @@ export class BaseShape extends joint.dia.Element {
   }
 }
 
-export class ShapeA extends BaseShape {
-  constructor() {
-    const params = {
-      parameter1: "Value 1A",
-      parameter2: "Value 2A",
-    };
-    super(params);
-    this.attr({
-      body: { fill: "#ff0000" }, // Red color in hex format
-      label: { text: "ShapeA" },
-    });
-  }
+export const createShape = (
+  type: string,
+  params: BlockParams,
+  processorName: string,
+  color: string,
+  label: string
+): DynamicShape => {
+  return new DynamicShape(params, processorName, color, label);
+};
 
-  processInputData() {
-    // Custom processing for ShapeA
-    const params = this.get("params");
-    const inputData = this.get("inputData");
-    this.set("data", `${params.parameter1}-${params.parameter2}:${inputData}`);
-  }
-}
-
-export class ShapeB extends BaseShape {
-  constructor() {
-    const params = {
-      parameter1: "Value 1B",
-      parameter2: "Value 2B",
-    };
-    super(params);
-    this.attr({
-      body: { fill: "#00ff00" }, // Green color in hex format
-      label: { text: "ShapeB" },
-    });
-  }
-
-  processInputData() {
-    // Custom processing for ShapeB
-    const params = this.get("params");
-    const inputData = this.get("inputData");
-    this.set("data", `${inputData}:${params.parameter1}-${params.parameter2}`);
-  }
-}
-
-export class ShapeC extends BaseShape {
-  constructor() {
-    const params = {
-      parameter1: "Value 1C",
-      parameter2: "Value 2C",
-    };
-    super(params);
-    this.attr({
-      body: { fill: "#0000ff" }, // Blue color in hex format
-      label: { text: "ShapeC" },
-    });
-  }
-
-  processInputData() {
-    // Custom processing for ShapeC
-    const params = this.get("params");
-    const inputData = this.get("inputData");
-    this.set("data", `${params.parameter1}${inputData}${params.parameter2}`);
-  }
-}
+export const availableShapes = mockBlocks.map((block) => ({
+  type: block.type,
+  create: () =>
+    createShape(
+      block.type,
+      block.params,
+      block.dataProcessor,
+      block.color,
+      block.label
+    ),
+}));
