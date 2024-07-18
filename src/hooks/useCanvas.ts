@@ -155,6 +155,24 @@ export function useCanvas(
     }
   };
 
+  const start = () => {
+    if (selectedCell.value) {
+      const cellData = selectedCell.value.get("data");
+      const outgoingLinks = graph.getConnectedLinks(selectedCell.value, {
+        outbound: true,
+      });
+      outgoingLinks.forEach((link) => {
+        const targetId = link.get("target").id;
+        if (targetId) {
+          const targetCell = graph.getCell(targetId) as BaseShape;
+          if (targetCell) {
+            targetCell.receiveData(cellData);
+          }
+        }
+      });
+    }
+  };
+
   return {
     contextMenuVisible,
     contextMenuPosition,
@@ -164,5 +182,6 @@ export function useCanvas(
     deleteCell,
     hideContextMenu,
     selectedCellProperties,
+    start,
   };
 }

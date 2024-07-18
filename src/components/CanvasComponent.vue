@@ -44,6 +44,7 @@ export default defineComponent({
       deleteCell,
       hideContextMenu,
       selectedCellProperties,
+      start,
     } = useCanvas(canvasContainer, canvas);
 
     watch(
@@ -59,9 +60,10 @@ export default defineComponent({
       emit("update-properties", newProperties);
     });
 
-    // Expose the method to the parent component
+    // Expose methods to the parent component
     expose({
       updateSelectedCell,
+      start,
     });
 
     return {
@@ -73,6 +75,7 @@ export default defineComponent({
       deleteCell,
       hideContextMenu,
       updateSelectedCell,
+      start,
     };
   },
 });

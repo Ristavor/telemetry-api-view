@@ -19,6 +19,7 @@
         <input type="text" v-model="updatedData" disabled />
       </p>
       <button @click="updateBlock">Update</button>
+      <button @click="start">Start</button>
     </div>
     <div v-else>
       <p>Please select a block to view its properties.</p>
@@ -43,7 +44,7 @@ export default defineComponent({
       default: null,
     },
   },
-  emits: ["update-block"],
+  emits: ["update-block", "start"],
   setup(props, { emit }) {
     const updatedName = ref("");
     const updatedParams = ref<BlockParams>({});
@@ -72,12 +73,17 @@ export default defineComponent({
       });
     };
 
+    const start = () => {
+      emit("start");
+    };
+
     return {
       updatedName,
       updatedParams,
       updatedColor,
       updatedData,
       updateBlock,
+      start,
     };
   },
 });

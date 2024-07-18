@@ -50,6 +50,10 @@ export class BaseShape extends joint.dia.Element {
   generateData(params: BlockParams): string {
     return Object.values(params).join(" ");
   }
+
+  receiveData(data: string) {
+    this.set("data", data);
+  }
 }
 
 export class ShapeA extends BaseShape {

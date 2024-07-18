@@ -11,6 +11,7 @@
       <SettingsPanel
         :properties="selectedProperties"
         @update-block="updateBlock"
+        @start="start"
       />
     </div>
     <InfoPanel />
@@ -39,21 +40,38 @@ export default defineComponent({
     const shapeToAdd = ref<string | null>(null);
     const selectedProperties = ref<{
       name: string;
+      color: string;
       params: BlockParams;
+      data: string;
     } | null>(null);
     const canvasComponent = ref<InstanceType<typeof CanvasComponent> | null>(
       null
     );
 
     const updateProperties = (
-      properties: { name: string; params: BlockParams } | null
+      properties: {
+        name: string;
+        color: string;
+        params: BlockParams;
+        data: string;
+      } | null
     ) => {
       selectedProperties.value = properties;
     };
 
-    const updateBlock = (properties: { name: string; params: BlockParams }) => {
+    const updateBlock = (properties: {
+      name: string;
+      color: string;
+      params: BlockParams;
+    }) => {
       if (canvasComponent.value) {
         canvasComponent.value.updateSelectedCell(properties);
+      }
+    };
+
+    const start = () => {
+      if (canvasComponent.value) {
+        canvasComponent.value.start();
       }
     };
 
@@ -62,6 +80,7 @@ export default defineComponent({
       selectedProperties,
       updateProperties,
       updateBlock,
+      start,
       canvasComponent,
     };
   },
