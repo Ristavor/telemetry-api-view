@@ -1,6 +1,6 @@
 import * as joint from "jointjs";
 import { dataProcessors } from "./dataProcessors";
-import { BlockParams } from "./types";
+import { BlockParams } from "./services/types";
 
 const baseMarkup = [
   {
